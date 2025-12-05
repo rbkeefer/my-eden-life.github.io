@@ -42,10 +42,10 @@
         }
         input[type="text"]:focus {
             outline: none;
-            border-color: #4CAF50;
+            border-color: #698c87ff;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #698c87ff;
             color: white;
             padding: 12px 24px;
             border: none;
@@ -56,21 +56,22 @@
             margin-top: 10px;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #698c8740;
+            color: #698c87ff;
         }
         .result {
             margin-top: 30px;
             padding: 20px;
-            background-color: #e8f5e8;
-            border: 1px solid #4CAF50;
+            background-color: #698c8740;
+            border: 1px solid #698c87ff;
             border-radius: 5px;
             display: none;
         }
         .code-display {
-            font-size: 24px;
+            font-size: 32px;
             font-weight: bold;
             text-align: center;
-            color: #2d5a2d;
+            color: black;
             margin-top: 10px;
             padding: 10px;
             background-color: #f0f8f0;
@@ -78,9 +79,9 @@
             letter-spacing: 2px;
         }
         .error {
-            background-color: #ffe8e8;
-            border-color: #ff6b6b;
-            color: #d63031;
+            background-color: #af460c40;
+            border-color: #af460cff;
+            color: #af460cff;
         }
     </style>
 </head>
@@ -96,7 +97,7 @@
         <button onclick="calculateHash()">Generate Registration Code</button>
         
         <div id="result" class="result">
-            <p>Please enter this 6-digit code into your device:</p>
+            <p>Please ask the customer to enter this 6-digit code into their device:</p>
             <div id="codeDisplay" class="code-display"></div>
         </div>
     </div>
@@ -113,7 +114,7 @@
             
             // Validate input
             if (!serialNumber) {
-                showError('Please enter a serial number.');
+                showError('Please enter a serial number above.');
                 return;
             }
             
