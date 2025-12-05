@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Eden Life Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4CAF50;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: #e8f5e8;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            display: none;
+        }
+        .code-display {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            color: #2d5a2d;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f0f8f0;
+            border-radius: 5px;
+            letter-spacing: 2px;
+        }
+        .error {
+            background-color: #ffe8e8;
+            border-color: #ff6b6b;
+            color: #d63031;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Eden Life Registration</h1>
+        
+        <div class="input-group">
+            <label for="serialNumber">Enter the Serial Number:</label>
+            <input type="text" id="serialNumber" placeholder="Enter serial number here..." />
+        </div>
+        
+        <button onclick="calculateHash()">Generate Registration Code</button>
+        
+        <div id="result" class="result">
+            <p>Please enter this 6-digit code into your device:</p>
+            <div id="codeDisplay" class="code-display"></div>
+        </div>
+    </div>
+
+    <script>
+        async function calculateHash() {
+            const serialNumber = document.getElementById('serialNumber').value.trim();
+            const resultDiv = document.getElementById('result');
+            const codeDisplay = document.getElementById('codeDisplay');
+            
+            // Clear previous results
+            resultDiv.style.display = 'none';
+            resultDiv.classList.remove('error');
+            
+            // Validate input
+            if (!serialNumber) {
+                showError('Please enter a serial number.');
+                return;
+            }
+            
+            try {
+                // Calculate SHA-256 hash of the serial number
+                const encoder = new TextEncoder();
+                const data = encoder.encode(serialNumber);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                
+                // Convert hash to hex string
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                // Get last 6 digits from the hash
+                const lastSixDigits = hashHex.replace(/[a-f]/g, '').slice(-6);
+                
+                // If we don't have 6 digits, pad with zeros or use a different approach
+                let finalCode;
+                if (lastSixDigits.length >= 6) {
+                    finalCode = lastSixDigits.slice(-6);
+                } else {
+                    // Convert entire hash to a number and get last 6 digits
+                    const hashNumber = parseInt(hashHex.slice(-8), 16);
+                    finalCode = (hashNumber % 1000000).toString().padStart(6, '0');
+                }
+                
+                // Display the result
+                codeDisplay.textContent = finalCode;
+                resultDiv.style.display = 'block';
+                
+            } catch (error) {
+                showError('An error occurred while calculating the hash. Please try again.');
+                console.error('Hash calculation error:', error);
+            }
+        }
+        
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            const codeDisplay = document.getElementById('codeDisplay');
+            
+            resultDiv.classList.add('error');
+            codeDisplay.textContent = message;
+            resultDiv.style.display = 'block';
+        }
+        
+        // Allow pressing Enter to calculate hash
+        document.getElementById('serialNumber').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                calculateHash();
+            }
+        });
+        
+        // Clear result when user starts typing
+        document.getElementById('serialNumber').addEventListener('input', function() {
+            document.getElementById('result').style.display = 'none';
+        });
+    </script>
+</body>
+</html>
